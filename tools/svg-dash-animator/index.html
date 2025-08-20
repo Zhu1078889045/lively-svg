@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SVG 虚线动画与 GIF 导出</title>
+  <script>
+    // 关闭 Tailwind 预设重置，避免干扰现有样式
+    window.tailwind = window.tailwind || {};
+    window.tailwind.config = { corePlugins: { preflight: false } };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./style.css" />
+  <!-- GIF 生成库（CDN）。若本地 file:// 直接打开遇到 Worker 加载问题，建议用本地静态服务器打开 -->
+  <script src="scripts/gif.js"></script>
+  <script src="scripts/CCapture.all.min.js"></script>
+  <!-- ffmpeg.wasm UMD（用于 WebM -> 高质量 GIF 转码） -->
+  <script src="scripts/ffmpeg.js"></script>
+</head>
+<body>
+  <header class="toolbar">
+    <div class="left">
+      <label class="file-label">
+        选择 SVG
+        <input type="file" id="fileInput" accept=".svg,image/svg+xml" />
+      </label>
+      <button id="addAnimBtn" disabled class="px-3 py-2 rounded bg-indigo-600 text-white disabled:opacity-50 hover:bg-indigo-700 transition">识别虚线并让它动起来</button>
+      <button id="exportGifBtn" disabled class="px-3 py-2 rounded bg-emerald-600 text-white disabled:opacity-50 hover:bg-emerald-700 transition">导出 GIF</button>
+      <button id="exportSvgBtn" disabled class="px-3 py-2 rounded bg-amber-600 text-white disabled:opacity-50 hover:bg-amber-700 transition">导出动效 SVG</button>
+      <button id="exportWebmBtn" disabled class="px-3 py-2 rounded bg-sky-600 text-white disabled:opacity-50 hover:bg-sky-700 transition">导出 WebM</button>
+      <button id="webmToGifBtn" disabled class="px-3 py-2 rounded bg-fuchsia-600 text-white disabled:opacity-50 hover:bg-fuchsia-700 transition">WebM转高质量GIF</button>
+      <div class="controls flex flex-wrap items-center gap-2 ml-4">
+        <label>预览时长(s)
+          <input id="previewDuration" type="number" min="0.2" step="0.1" value="4" />
+        </label>
+        <label>fps
+          <input id="gifFps" type="number" min="1" max="60" step="1" value="12" />
+        </label>
+        <label>时长(s)
+          <input id="gifDuration" type="number" min="0.5" step="0.5" value="1.5" />
+        </label>
+        <label>缩放
+          <select id="gifScale">
+            <option value="1">100%</option>
+            <option value="0.75">75%</option>
+            <option value="0.5" selected>50%</option>
+            <option value="0.25">25%</option>
+          </select>
+        </label>
+        <label>质量(1高-30低)
+          <input id="gifQuality" type="number" min="1" max="30" step="1" value="20" />
+        </label>
+        <label><input id="gifDither" type="checkbox" />抖动</label>
+      </div>
+    </div>
+    <div class="right">
+      <span id="status" class="status text-sm text-gray-600"></span>
+    </div>
+  </header>
+
+  <main class="panes">
+    <section class="pane">
+      <div class="pane-title">原图</div>
+      <div class="svg-wrap" id="originalPane"></div>
+    </section>
+    <section class="pane">
+      <div class="pane-title">效果图</div>
+      <div class="svg-wrap" id="effectPane"></div>
+    </section>
+  </main>
+
+  <footer class="tips">
+    注意：
+    1) GIF 导出需要逐帧渲染，图像复杂或尺寸较大时会耗时；
+    2) 如果直接双击 file:// 打开导致 GIF 失败，请用本地静态服务器（如 VSCode Live Server）打开此目录；
+    3) 导出前会移除 SVG 内的外部字体 @import 以避免画布被污染。
+  </footer>
+
+  <script src="./app.js?v=13"></script>
+</body>
+</html>
